@@ -31,11 +31,14 @@ class Field:
             fmt = self.format(v).name
             if "|" in fmt:
                 values = fmt.split("|")
-                fmt = fmt.replace("|", "\n" + " "*43)
             else:
                values = [fmt]
-            for v in values:
-                res = self.format.desc(v) + "\n" + " "*43
+            
+            res = ""
+            for i in range(len(values)):
+                res += self.format.desc(values[i])
+                if i != len(values) - 1:
+                    res += "\n" + " "*43
             
             self.fmt_value = res
         elif callable(self.format):
@@ -183,6 +186,15 @@ class Executable:
         return res
 
 def bytes_str(s):
+    labels = ["B", "KB", "MB", "GB"]
+    
+    counter = 0
+    while s >= 1024:
+        s /= 1024
+        counter += 1
+    return f"{s:.02f} {labels[counter]}"
+        
+    """
     if s >= 1024:
         b = s / 1024
         if b >= 1024:
@@ -190,7 +202,8 @@ def bytes_str(s):
             return f"{c:.02f} MB"
         return f"{b:.02f} KB"
     return str(s) + " bytes"
-
+    """
+    
 DOSHEADER = [
     Field("Magic Number", 0, 2, int=False),
     Field("PE Header Address", 0x3c, 4, format=hex), 
